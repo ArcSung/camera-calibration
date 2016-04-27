@@ -1,0 +1,51 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <org.opencv.samples.cameracalibration.CameraView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/mainactivity_surface_view" />
+
+    <RelativeLayout
+        android:id="@+id/RelateLayout02"
+        android:layout_height="fill_parent"
+        android:layout_width="65dp"
+        android:background="#88606060"
+        android:layout_alignParentRight="true">
+        <ImageButton
+            android:id="@+id/camera_takepicture"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:background="#00606060"
+            android:layout_centerVertical="true"
+            android:src="@drawable/camera_takepicture" />
+
+        <ImageButton
+            android:id="@+id/camera_cancel"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:background="#00606060"
+            android:src="@drawable/camera_cancel" />
+
+        <ImageButton
+            android:id="@+id/camera_check"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_alignParentTop="true"
+            android:background="#00606060"
+            android:src="@drawable/camera_check" />
+        <ImageButton
+            android:id="@+id/camera_gralloc"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="#00606060"
+            android:src="@drawable/camera_gralloc" />
+    </RelativeLayout>
+
+</RelativeLayout>
