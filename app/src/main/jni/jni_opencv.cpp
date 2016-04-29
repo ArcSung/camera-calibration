@@ -171,11 +171,54 @@ inline double dist(Point a, Point b){
 
         for(int i=0;i<contours_poly.size();i++){
             vector< Point2f > temp;
+            int minsum = 10000, maxsum = 0, mindiff = 10000, maxdiff = 10000;
+            Point2f L1, L2, L3, L4;
+            int tl1, br1;
+
             for(int j=0;j<contours_poly[i].size();j++){
-                temp.push_back( Point2f(contours_poly[i][j].x, contours_poly[i][j].y) );
-                LOGI("contours_poly[%d][%d] = (%d, %d)", i, j, contours_poly[i][j].x, contours_poly[i][j].y);
-                circle(image, cvPoint(contours_poly[i][j].x, contours_poly[i][j].y), 3, CV_RGB(0, 0, 255), 3, CV_AA);
+                //temp.push_back( Point2f(contours_poly[i][j].x, contours_poly[i][j].y) );
+                //circle(image, cvPoint(contours_poly[i][j].x, contours_poly[i][j].y), 3, CV_RGB(0, 0, 255), 3, CV_AA);
+                if(contours_poly[i][j].x+ contours_poly[i][j].y < minsum)
+                {
+                    minsum = contours_poly[i][j].x+ contours_poly[i][j].y;
+                    L1 = Point2f(contours_poly[i][j].x, contours_poly[i][j].y);
+                    tl1 = j;
+                }
+
+                if(contours_poly[i][j].x+ contours_poly[i][j].y > maxsum)
+                {
+                    maxsum = contours_poly[i][j].x+ contours_poly[i][j].y;
+                    L3 = Point2f(contours_poly[i][j].x, contours_poly[i][j].y);
+                    br1 = j;
+                }
             }
+
+            LOGI("tl1: %d, br1: %d", tl1, br1);
+
+            for(int j=0;j<contours_poly[i].size();j++){
+
+                if(j == br1 || j == tl1)
+                    continue;
+                if(contours_poly[i][j].x < mindiff)
+                {
+                    mindiff = contours_poly[i][j].x;
+                    L4 = Point2f(contours_poly[i][j].x, contours_poly[i][j].y);
+                }
+
+                if(contours_poly[i][j].y < maxdiff)
+                {
+                    maxdiff = contours_poly[i][j].y;
+                    L2 = Point2f(contours_poly[i][j].x, contours_poly[i][j].y);
+                }
+            }
+            temp.push_back(L1);
+            temp.push_back(L2);
+            temp.push_back(L3);
+            temp.push_back(L4);
+            circle(image, L1, 3, CV_RGB(0, 0, 255), 3, CV_AA);
+            circle(image, L2, 3, CV_RGB(0, 0, 255), 3, CV_AA);
+            circle(image, L3, 3, CV_RGB(0, 0, 255), 3, CV_AA);
+            circle(image, L4, 3, CV_RGB(0, 0, 255), 3, CV_AA);
             contoursFinded.push_back(temp);
         }
 
@@ -295,7 +338,6 @@ inline double dist(Point a, Point b){
                 LOGI("src size: %d", contoursFinded[0].size());
                 LOGI("obj size: %d", contoursFindedObjectPoints.size());
 
-                //contoursFinded[0].
 
                 LOGI("solvePnP");
                 cv::solvePnP(m2,
