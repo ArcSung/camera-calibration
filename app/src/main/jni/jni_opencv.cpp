@@ -36,6 +36,7 @@ Mat rvecs, tvecs;
 cv::Mat cameraMatrix;
 cv::Mat distCoeffs;
 Point sPoint, tPoint;
+int tlx, tly, brx, bry;
 
 int nImages = 5;
 bool done = false;
@@ -193,8 +194,6 @@ inline double dist(Point a, Point b){
                 }
             }
 
-            LOGI("tl1: %d, br1: %d", tl1, br1);
-
             for(int j=0;j<contours_poly[i].size();j++){
 
                 if(j == br1 || j == tl1)
@@ -211,6 +210,12 @@ inline double dist(Point a, Point b){
                     L2 = Point2f(contours_poly[i][j].x, contours_poly[i][j].y);
                 }
             }
+
+            tlx = (L1.x < L4.x) ? L1.x : L4.x;
+            tly = (L1.y < L2.y) ? L1.y : L2.y;
+            brx = (L3.x > L2.x) ? L3.x : L2.x;
+            bry = (L3.y > L4.y) ? L3.y : L4.y;
+
             temp.push_back(L1);
             temp.push_back(L2);
             temp.push_back(L3);
@@ -333,6 +338,15 @@ inline double dist(Point a, Point b){
 
                 Mat m1(contoursFinded[0]);
                 Mat m2(contoursFindedObjectPoints);
+                CvPoint2D32f srcTri[4], dstTri[4];
+
+
+                int ROIW = brx - tlx - 1;
+                int ROIH = bry - tly - 1;
+
+                Mat SrcROI = mRgb(Rect(tlx, tly, ROIW, ROIH));
+                //SrcROI.type() = mRgb.type();
+                //Mat SrcROI(ROIW, ROIH, mRgb.type(), Scalar(255, 255, 255));
 
 
                 LOGI("src size: %d", contoursFinded[0].size());
@@ -397,9 +411,16 @@ inline double dist(Point a, Point b){
                 putText(mRgb, str,
                         Point(10,mRgb.rows - 40), FONT_HERSHEY_PLAIN, 2, CV_RGB(0,255,0));
 
+                if(ROIW < (mRgb.rows/2 && ROIH < mRgb.cols/3)*2) {
+                    LOGI("ROI %d, %d", ROIW, ROIH);
+                    //SrcROI.copyTo(mRgb.rowRange(0, ROIW), mRgb.colRange(0, ROIH));
+                    imwrite("/sdcard/CameraCalib.jpg", SrcROI);
+                }
+
                 m1.release();
                 m2.release();
                 rmat.release();
+                SrcROI.release();
 
             }
             LOGI("drawProcessing ends");
