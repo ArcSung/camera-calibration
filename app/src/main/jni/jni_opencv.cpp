@@ -430,9 +430,10 @@ inline double dist(Point a, Point b){
 
                 if(ROIW < mRgb.rows/2 && ROIH < mRgb.cols/2) {
                     LOGI("ROI %d, %d", ROIW, ROIH);
-                    //SrcROI.copyTo(mRgb.rowRange(0, ROIW), mRgb.colRange(0, ROIH));
-                    imwrite("/sdcard/CameraCalib.jpg", SrcROI);
-                    imwrite("/sdcard/CameraCalib2.jpg", dst_img);
+                    dst_img.copyTo(mRgb(Rect(0, 0, ROIW, ROIH)));
+                    //mRgb.copyTo(dst_img);
+                    //imwrite("/sdcard/CameraCalib.jpg", SrcROI);
+                    //imwrite("/sdcard/CameraCalib2.jpg", dst_img);
                 }
 
                 m1.release();
