@@ -37,6 +37,7 @@ cv::Mat cameraMatrix;
 cv::Mat distCoeffs;
 Point sPoint, tPoint;
 int tlx, tly, brx, bry;
+Point2f LL1, LL2, LL3, LL4;
 
 int nImages = 5;
 bool done = false;
@@ -216,6 +217,11 @@ inline double dist(Point a, Point b){
             brx = (L3.x > L2.x) ? L3.x : L2.x;
             bry = (L3.y > L4.y) ? L3.y : L4.y;
 
+            LL1 = L1;
+            LL2 = L2;
+            LL3 = L3;
+            LL4 = L4;
+
             temp.push_back(L1);
             temp.push_back(L2);
             temp.push_back(L3);
@@ -344,9 +350,20 @@ inline double dist(Point a, Point b){
                 int ROIW = brx - tlx - 1;
                 int ROIH = bry - tly - 1;
 
+
                 Mat SrcROI = mRgb(Rect(tlx, tly, ROIW, ROIH));
                 //SrcROI.type() = mRgb.type();
                 //Mat SrcROI(ROIW, ROIH, mRgb.type(), Scalar(255, 255, 255));
+
+                // 設定變換[之前]與[之後]的坐標 (左上,左下,右下,右上)
+                const int nOffset=200;
+                cv::Point2f pts1[] = {LL1,LL4,LL3,LL2};
+                cv::Point2f pts2[] = {cv::Point2f(0,0),cv::Point2f(0,ROIH),cv::Point2f(ROIW,ROIH),cv::Point2f(ROIW,0)};
+
+                cv::Mat perspective_matrix = cv::getPerspectiveTransform(pts1, pts2);
+                cv::Mat dst_img;
+                // 變換
+                cv::warpPerspective(mRgb, dst_img, perspective_matrix, Size(ROIW, ROIH), cv::INTER_LINEAR);
 
 
                 LOGI("src size: %d", contoursFinded[0].size());
@@ -411,10 +428,11 @@ inline double dist(Point a, Point b){
                 putText(mRgb, str,
                         Point(10,mRgb.rows - 40), FONT_HERSHEY_PLAIN, 2, CV_RGB(0,255,0));
 
-                if(ROIW < (mRgb.rows/2 && ROIH < mRgb.cols/3)*2) {
+                if(ROIW < mRgb.rows/2 && ROIH < mRgb.cols/2) {
                     LOGI("ROI %d, %d", ROIW, ROIH);
                     //SrcROI.copyTo(mRgb.rowRange(0, ROIW), mRgb.colRange(0, ROIH));
                     imwrite("/sdcard/CameraCalib.jpg", SrcROI);
+                    imwrite("/sdcard/CameraCalib2.jpg", dst_img);
                 }
 
                 m1.release();
